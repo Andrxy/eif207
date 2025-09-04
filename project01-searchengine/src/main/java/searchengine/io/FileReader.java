@@ -1,6 +1,8 @@
 package searchengine.io;
 
 import searchengine.datastructures.Vector;
+import searchengine.index.invertedindex.InvertedIndex;
+import searchengine.index.invertedindex.InvertedIndexBuilder;
 import searchengine.model.Document;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +11,11 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 public class FileReader {
-    private String path = "";
+    private String path;
+
+    public FileReader() {
+        path = "C:/Users/Dell/IdeaProjects/eif207/project01-searchengine/src/files";
+    }
 
     public Vector<Document> readFiles() throws IOException {
         Vector<Document> documents = new Vector<>();
@@ -17,7 +23,7 @@ public class FileReader {
         File dir = new File(path);
         File[] files = dir.listFiles();
 
-        if (files != null) return documents;
+        if (files == null) return documents;
 
         for (File file : files) {
             String base64Name = file.getName().replace(".txt", "");
@@ -28,7 +34,7 @@ public class FileReader {
 
             Document document = new Document(decodedName, rawContent);
 
-            // documents.add(document);
+            documents.add(document);
         }
 
         return documents;
