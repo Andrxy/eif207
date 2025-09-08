@@ -49,6 +49,11 @@ public class Vector<T> implements Iterable<T> {
         return vector[index];
     }
 
+    public void setAt(T element, int index) {
+        if (index >= size || index < 0) return;
+        vector[index] = element;
+    }
+
     public void swap(int i, int j) {
         T tmp = vector[i];
         vector[i] = vector[j];
@@ -59,8 +64,9 @@ public class Vector<T> implements Iterable<T> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        for (T element : vector)
-            if (element != null) sb.append(element);
+        for (int i = 0; i < size; i++) {
+            if (vector[i] != null) sb.append(vector[i]);
+        }
 
         return sb.toString();
     }

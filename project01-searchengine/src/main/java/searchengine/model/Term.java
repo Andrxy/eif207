@@ -51,6 +51,24 @@ public class Term {
         ++this.ttf;
     }
 
+    public void addPosting(Document document) {
+        Posting posting = postings.find(new Posting(document.getId()));
+
+        if (posting == null) {
+            postings.add(new  Posting(document.getId()));
+        }
+        else {
+            posting.incrementTF();
+        }
+
+        incrementTTF();
+    }
+
+    public void calculateIDF(int totalDocuments) {
+        int df = postings.getSize();
+        idf = (df > 0) ? Math.log((double) totalDocuments / df) : 0;
+    }
+
     @Override
     public String toString() {
         return "Term{" + term + " - " + ttf + " Postings{" + postings +"}" + "}\n";

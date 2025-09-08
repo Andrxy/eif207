@@ -1,8 +1,6 @@
 package searchengine.io;
 
 import searchengine.datastructures.Vector;
-import searchengine.index.invertedindex.InvertedIndex;
-import searchengine.index.invertedindex.InvertedIndexBuilder;
 import searchengine.model.Document;
 import java.io.File;
 import java.io.IOException;
