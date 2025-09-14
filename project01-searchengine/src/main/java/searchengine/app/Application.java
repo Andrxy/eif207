@@ -7,11 +7,10 @@ import searchengine.model.Document;
 import searchengine.model.DocumentScore;
 import searchengine.ranking.CosineSimilarityRanking;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class SearchEngineApp {
+public class Application {
 
     private Scanner scanner;
     private IndexManager indexManager;
@@ -21,7 +20,7 @@ public class SearchEngineApp {
     private static final String BINARY_INDEX_PATH = "data/index.bin";
     private static final String DOCUMENTS_DIR_PATH = "files";
 
-    public SearchEngineApp() {
+    public Application() {
         scanner = new Scanner(System.in);
         indexManager = new IndexManager();
         queryProcessor = new QueryProcessor(indexManager, new CosineSimilarityRanking());
@@ -76,8 +75,7 @@ public class SearchEngineApp {
             } else {
                 System.out.println("Resultados:");
                 for (DocumentScore ds : results) {
-                    System.out.printf("- %s (score: %.4f)\n",
-                            ds.getDocument().getDecodedName(), ds.getScore());
+                    System.out.printf("- %s (score: %.4f)\n", ds.getDocument().getDecodedName(), ds.getScore());
                 }
             }
         }
@@ -86,6 +84,6 @@ public class SearchEngineApp {
     }
 
     public static void main(String[] args) throws IOException {
-        new SearchEngineApp().run();
+        new Application().run();
     }
 }

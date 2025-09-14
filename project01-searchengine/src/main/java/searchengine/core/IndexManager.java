@@ -2,7 +2,7 @@ package searchengine.core;
 
 import searchengine.datastructures.Vector;
 import searchengine.index.InvertedIndex;
-import searchengine.index.InvertedIndexBuilder;
+import searchengine.index.IndexBuilder;
 import searchengine.index.ZipfLaw;
 import searchengine.io.FileReader;
 import searchengine.io.IndexPersistence;
@@ -13,11 +13,11 @@ import java.io.IOException;
 
 public class IndexManager {
     private InvertedIndex index;
-    private InvertedIndexBuilder builder;
+    private IndexBuilder builder;
 
     public IndexManager() {
         this.index = InvertedIndex.getInstance(); // O podrías permitir instanciación normal para tests
-        this.builder = new InvertedIndexBuilder();
+        this.builder = new IndexBuilder();
     }
 
     public InvertedIndex getIndex() {
@@ -86,7 +86,7 @@ public class IndexManager {
             if (term != null) {
                 term.getPostings().forEach(posting -> {
                     Document doc = posting.getDocument();
-                    if (candidates.find(doc) == null) { // evita duplicados
+                    if (candidates.find(doc) == null) {
                         candidates.add(doc);
                     }
                 });

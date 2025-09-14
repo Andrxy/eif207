@@ -12,7 +12,7 @@ public class Term implements Serializable {
 
     public Term(String term) {
         this.term = term;
-        this.ttf = 1;
+        this.ttf = 0;
         this.postings = new Vector<>();
         this.idf = 0;
     }

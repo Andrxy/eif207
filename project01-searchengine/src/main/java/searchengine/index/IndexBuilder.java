@@ -6,7 +6,7 @@ import searchengine.model.Term;
 import searchengine.utils.Normalizer;
 import searchengine.utils.Tokenizer;
 
-public class InvertedIndexBuilder {
+public class IndexBuilder {
     public void buildForDocument(InvertedIndex index, Document document) {
         String normalizedContent = Normalizer.normalize(document.getRawContent());
         Vector<String> tokens = Tokenizer.tokenize(normalizedContent);
