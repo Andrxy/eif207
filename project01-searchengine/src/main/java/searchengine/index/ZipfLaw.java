@@ -1,6 +1,8 @@
 package searchengine.index;
 
 import searchengine.core.IndexManager;
+import searchengine.datastructures.Vector;
+import searchengine.model.Term;
 
 public class ZipfLaw {
     private double percentile;
@@ -10,10 +12,12 @@ public class ZipfLaw {
     }
 
     public void filter(InvertedIndex index) {
-        int size = index.getCorpus().getSize();
+        Vector<Term> corpus =  index.getCorpus();
+
+        int size = corpus.getSize();
         int sizePercentile = (int) (size * percentile);
         int newSize = size -  sizePercentile;
 
-        index.getCorpus().setSize(newSize);
+        corpus.setSize(newSize);
     }
 }

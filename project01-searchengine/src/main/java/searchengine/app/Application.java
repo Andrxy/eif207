@@ -3,22 +3,20 @@ package searchengine.app;
 import searchengine.core.IndexManager;
 import searchengine.core.QueryProcessor;
 import searchengine.datastructures.Vector;
+import searchengine.index.ZipfLaw;
 import searchengine.model.Document;
 import searchengine.model.DocumentScore;
 import searchengine.ranking.CosineSimilarityRanking;
 
+import searchengine.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class Application {
-
     private Scanner scanner;
     private IndexManager indexManager;
     private QueryProcessor queryProcessor;
 
-    // Rutas absolutas predefinidas
-    private static final String BINARY_INDEX_PATH = "data/index.bin";
-    private static final String DOCUMENTS_DIR_PATH = "files";
 
     public Application() {
         scanner = new Scanner(System.in);
@@ -42,22 +40,23 @@ public class Application {
         int choice = Integer.parseInt(scanner.nextLine());
 
         if (choice == 1) {
-            indexManager.loadIndex(BINARY_INDEX_PATH);
+            indexManager.loadIndex();
         } else if (choice == 2) {
-            Vector<Document> documents = indexManager.readDocuments(DOCUMENTS_DIR_PATH);
+            FileReader reader = new FileReader();
+            Vector<Document> documents = reader.readFiles();
             indexManager.buildIndex(documents);
-            indexManager.saveIndex(BINARY_INDEX_PATH);
+            indexManager.saveIndex();
         } else {
             System.out.println("Opción inválida. Saliendo...");
-            System.exit(0);
         }
     }
 
     private void configureZipf() {
         System.out.print("Ingrese porcentaje de Ley de Zipf a aplicar (0 a 1, ej: 0.1): ");
         double percentile = Double.parseDouble(scanner.nextLine());
-        indexManager.applyZipf(percentile);
-        indexManager.sortAlphabetically();
+
+        ZipfLaw zipf = new  ZipfLaw(percentile);
+        zipf.filter(indexManager.getIndex());
     }
 
     private void queryLoop() {

@@ -2,7 +2,6 @@ package searchengine.index;
 
 import searchengine.datastructures.Vector;
 import searchengine.model.Document;
-import searchengine.model.Posting;
 import searchengine.model.Term;
 
 import java.io.Serializable;
