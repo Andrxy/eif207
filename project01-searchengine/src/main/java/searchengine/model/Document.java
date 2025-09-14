@@ -1,6 +1,8 @@
 package searchengine.model;
 
-public class Document {
+import java.io.Serializable;
+
+public class Document implements Serializable {
     private static int nextId = -1;
 
     private int id;

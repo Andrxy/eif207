@@ -13,7 +13,15 @@ public class DocumentScore {
         return document;
     }
 
+    public void setDocument(Document document) {
+        this.document = document;
+    }
+
     public double getScore() {
         return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
     }
 }

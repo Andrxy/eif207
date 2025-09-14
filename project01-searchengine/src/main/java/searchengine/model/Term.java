@@ -2,7 +2,9 @@ package searchengine.model;
 
 import searchengine.datastructures.Vector;
 
-public class Term {
+import java.io.Serializable;
+
+public class Term implements Serializable {
     private String term;
     private int ttf;
     private Vector<Posting> postings;
@@ -52,13 +54,13 @@ public class Term {
     }
 
     public void addPosting(Document document) {
-        Posting posting = postings.find(new Posting(document.getId()));
+        Posting posting = postings.find(new Posting(document));
 
         if (posting == null) {
-            postings.add(new  Posting(document.getId()));
+            postings.add(new Posting(document));
         }
         else {
-            posting.incrementTF();
+            posting.incrementTf();
         }
 
         incrementTTF();
@@ -66,7 +68,7 @@ public class Term {
 
     public void calculateIDF(int totalDocuments) {
         int df = postings.getSize();
-        idf = (df > 0) ? Math.log((double) totalDocuments / df) : 0;
+        idf = (df > 0) ? Math.log10((double) totalDocuments / df) : 0;
     }
 
     @Override

@@ -1,8 +1,9 @@
 package searchengine.datastructures;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
-public class Vector<T> implements Iterable<T> {
+public class Vector<T> implements Iterable<T>, Serializable {
     private T[] vector;
     private int capacity;
     private int size;
@@ -65,7 +66,7 @@ public class Vector<T> implements Iterable<T> {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < size; i++) {
-            if (vector[i] != null) sb.append(vector[i]);
+            if (vector[i] != null) sb.append(i + " ").append(vector[i]);
         }
 
         return sb.toString();

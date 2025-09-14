@@ -9,16 +9,12 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 public class FileReader {
-    private String path;
-
-    public FileReader() {
-        path = "C:/Users/Dell/IdeaProjects/eif207/project01-searchengine/src/files";
-    }
+    private static String path = "files";
 
     public Vector<Document> readFiles() throws IOException {
         Vector<Document> documents = new Vector<>();
 
-        File dir = new File(path);
+        File dir = new File(FileReader.class.getClassLoader().getResource(path).getFile());
         File[] files = dir.listFiles();
 
         if (files == null) return documents;

@@ -1,20 +1,22 @@
 package searchengine.model;
 
-public class Posting {
-    private int docId;
+import java.io.Serializable;
+
+public class Posting implements Serializable {
+    private Document document;
     private int tf;
 
-    public Posting(int docId) {
-        this.docId = docId;
+    public Posting(Document document) {
+        this.document = document;
         this.tf = 1;
     }
 
-    public int getDocId() {
-        return docId;
+    public Document getDocument() {
+        return document;
     }
 
-    public void setDocId(int docId) {
-        this.docId = docId;
+    public void setDocument(Document document) {
+        this.document = document;
     }
 
     public int getTf() {
@@ -25,8 +27,8 @@ public class Posting {
         this.tf = tf;
     }
 
-    public void incrementTF() {
-        ++this.tf;
+    public void incrementTf() {
+        this.tf++;
     }
 
     @Override
@@ -35,13 +37,13 @@ public class Posting {
         if (obj == null || getClass() != obj.getClass())  return false;
 
         Posting other =  (Posting) obj;
-        return docId == other.docId;
+        return document.getId() == other.document.getId();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.valueOf(docId)).append("   ");
+        sb.append(document.getId());
         return sb.toString();
     }
 }

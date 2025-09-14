@@ -1,5 +1,7 @@
 package searchengine.index;
 
+import searchengine.core.IndexManager;
+
 public class ZipfLaw {
     private double percentile;
 

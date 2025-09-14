@@ -2,7 +2,6 @@ package searchengine.index;
 
 import searchengine.datastructures.Vector;
 import searchengine.model.Document;
-import searchengine.model.Posting;
 import searchengine.model.Term;
 import searchengine.utils.Normalizer;
 import searchengine.utils.Tokenizer;
@@ -19,6 +18,7 @@ public class InvertedIndexBuilder {
                 term = new Term(token);
                 index.getCorpus().add(term);
             }
+
             term.addPosting(document);
         }
     }
