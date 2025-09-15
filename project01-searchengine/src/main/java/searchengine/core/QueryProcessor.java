@@ -2,7 +2,6 @@ package searchengine.core;
 
 import searchengine.datastructures.Vector;
 import searchengine.index.InvertedIndex;
-import searchengine.index.VectorTFIDF;
 import searchengine.model.Document;
 import searchengine.model.DocumentScore;
 import searchengine.model.Posting;
@@ -12,53 +11,78 @@ import searchengine.utils.Normalizer;
 import searchengine.utils.Tokenizer;
 
 public class QueryProcessor {
-    private IndexManager manager;
+    private InvertedIndex index;
     private RankingStrategy ranking;
 
-    public QueryProcessor(IndexManager manager, RankingStrategy ranking) {
-        this.manager = manager;
-        this.ranking = ranking;
+    public QueryProcessor(InvertedIndex idx, RankingStrategy rank) {
+        this.index = idx;
+        this.ranking = rank;
     }
 
     public Vector<DocumentScore> process(String rawQuery) {
-        String normalizedQuery =  Normalizer.normalize(rawQuery);
+        // Normaliza el query
+        String normalizedQuery = Normalizer.normalize(rawQuery);
+
+        // Tokeniza el query
         Vector<String> tokenization = Tokenizer.tokenize(normalizedQuery);
 
-        Vector<Double> queryVector = VectorTFIDF.buildQueryVector(tokenization, manager);
+        // Vector de la consulta
+        Vector<Double> queryVec = VectorTFIDF.buildQueryVector(tokenization, index);
 
+        // Obtener Documentos candidatos
         Vector<Document> candidates = getCandidates(tokenization);
 
-        return ranking.rank(queryVector, candidates, manager);
+        // Rankear
+        return ranking.rank(queryVec, candidates, index);
     }
 
     public void setRanking(RankingStrategy ranking) {
         this.ranking = ranking;
     }
 
+    // Buscar Candidatos segun los terminos
     private Vector<Document> getCandidates(Vector<String> tokenization) {
         Vector<Document> candidates = new Vector<>();
+
         for (String token : tokenization) {
             Term term = searchTermBinary(token);
+
             if (term != null) {
-                term.getPostings().forEach(posting -> {
-                    Document doc = posting.getDocument();
-                    if (candidates.find(doc) == null) candidates.add(doc);
-                });
+                Vector<Posting> postings = term.getPostings();
+
+                for (Posting posting : postings) {
+                    Document document = posting.getDocument();
+                    if (candidates.find(document) == null) { // Evitar Duplicados
+                        candidates.add(document);
+                    }
+                }
             }
         }
+
         return candidates;
     }
 
+
+    // busqueda binaria en el corpus
     private Term searchTermBinary(String term) {
-        Vector<Term> corpus = manager.getCorpus();
-        int left = 0, right = corpus.getSize() - 1;
+        Vector<Term> corpus = index.getCorpus();
+
+        int left = 0;
+        int right = corpus.getSize() - 1;
+
         while (left <= right) {
-            int mid = (left + right) / 2;
-            int cmp = corpus.getAt(mid).getTerm().compareTo(term);
-            if (cmp == 0) return corpus.getAt(mid);
-            else if (cmp < 0) left = mid + 1;
-            else right = mid - 1;
+            int middle = (left + right) / 2;
+            int comparer = corpus.getAt(middle).getTerm().compareTo(term);
+
+            if (comparer == 0) {
+                return corpus.getAt(middle);
+            } else if (comparer < 0) {
+                left = middle + 1;
+            } else {
+                right = middle - 1;
+            }
         }
+
         return null;
     }
 }

@@ -1,6 +1,7 @@
-package searchengine.index;
+package searchengine.core;
 
 import searchengine.datastructures.Vector;
+import searchengine.index.InvertedIndex;
 import searchengine.model.Document;
 import searchengine.model.Term;
 import searchengine.utils.Normalizer;
@@ -26,6 +27,13 @@ public class IndexBuilder {
     public void buildIndex(InvertedIndex index, Vector<Document> documents) {
         for (Document document : documents) {
             buildForDocument(index, document);
+        }
+        computeIDF(index, documents.getSize());
+    }
+
+    private void computeIDF(InvertedIndex index, int totalDocuments) {
+        for (Term term : index.getCorpus()) {
+            term.calculateIDF(totalDocuments);
         }
     }
 }

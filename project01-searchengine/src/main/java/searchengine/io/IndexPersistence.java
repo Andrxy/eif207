@@ -8,38 +8,40 @@ import searchengine.model.Term;
 import java.io.*;
 
 public class IndexPersistence {
-    private static String path = "data/index.bin";
+
+    private static String filePath = "data/index.bin";
 
     public static void saveIndex(InvertedIndex index) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
-            // Guardar documentos
-            oos.writeObject(index.getDocuments());
+        try {
+            ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(filePath));
+            Vector<Document> documents = index.getDocuments();
+            Vector<Term> corpus = index.getCorpus();
 
-            // Guardar corpus (Terms con postings)
-            oos.writeObject(index.getCorpus());
+            output.writeObject(documents);
+            output.writeObject(corpus);
 
-            System.out.println("Índice guardado correctamente en " + path);
+            output.close();
+            System.out.println("Indice guardado con exito en " + filePath);
         } catch (IOException e) {
+            System.out.println("Error al guardar el indice");
             e.printStackTrace();
         }
     }
 
-    /**
-     * Carga el índice invertido desde un archivo binario.
-     */
-    @SuppressWarnings("unchecked")
     public static void loadIndex(InvertedIndex index) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
-            // Cargar documentos
-            Vector<Document> documents = (Vector<Document>) ois.readObject();
-            index.setDocuments(documents);
+        try {
+            ObjectInputStream input = new ObjectInputStream(new FileInputStream(filePath));
 
-            // Cargar corpus
-            Vector<Term> corpus = (Vector<Term>) ois.readObject();
+            Vector<Document> documents = (Vector<Document>) input.readObject();
+            Vector<Term> corpus = (Vector<Term>) input.readObject();
+
+            index.setDocuments(documents);
             index.setCorpus(corpus);
 
-            System.out.println("Índice cargado correctamente desde " + path);
+            input.close();
+            System.out.println("Indice cargado con exito de " + filePath);
         } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erroe al cargar el indice");
             e.printStackTrace();
         }
     }

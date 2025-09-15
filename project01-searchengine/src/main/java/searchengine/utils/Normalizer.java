@@ -14,15 +14,48 @@ public class Normalizer {
     }
 
     private static String replacePunctuation(String content) {
-        return content.replaceAll("[^a-zA-Z0-9]", " ");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < content.length(); i++) {
+            char character = content.charAt(i);
+
+            if ((character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == ' ') {
+                result.append(character);
+            } else {
+                result.append(' ');
+            }
+        }
+
+        return result.toString();
     }
 
     private static String replaceAccents(String content) {
-        return content
-                .replace("á", "a")
-                .replace("é", "e")
-                .replace("í", "i")
-                .replace("ó", "o")
-                .replace("ú", "u");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < content.length(); i++) {
+            char character = content.charAt(i);
+
+            switch (character) {
+                case 'á':
+                    result.append('a');
+                    break;
+                case 'é':
+                    result.append('e');
+                    break;
+                case 'í':
+                    result.append('i');
+                    break;
+                case 'ó':
+                    result.append('o');
+                    break;
+                case 'ú':
+                    result.append('u');
+                    break;
+                default:
+                    result.append(character);
+            }
+        }
+
+        return result.toString();
     }
 }

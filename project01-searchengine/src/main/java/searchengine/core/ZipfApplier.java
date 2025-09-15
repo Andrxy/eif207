@@ -1,13 +1,13 @@
-package searchengine.index;
+package searchengine.core;
 
-import searchengine.core.IndexManager;
 import searchengine.datastructures.Vector;
+import searchengine.index.InvertedIndex;
 import searchengine.model.Term;
 
-public class ZipfLaw {
+public class ZipfApplier {
     private double percentile;
 
-    public ZipfLaw(double percentile) {
+    public ZipfApplier(double percentile) {
         this.percentile = percentile;
     }
 

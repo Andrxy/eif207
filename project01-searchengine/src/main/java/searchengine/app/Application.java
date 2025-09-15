@@ -1,27 +1,36 @@
 package searchengine.app;
 
-import searchengine.core.IndexManager;
 import searchengine.core.QueryProcessor;
 import searchengine.datastructures.Vector;
-import searchengine.index.ZipfLaw;
+import searchengine.core.IndexBuilder;
+import searchengine.index.InvertedIndex;
+import searchengine.core.ZipfApplier;
+import searchengine.io.IndexPersistence;
 import searchengine.model.Document;
 import searchengine.model.DocumentScore;
 import searchengine.ranking.CosineSimilarityRanking;
 
-import searchengine.io.FileReader;
+import searchengine.io.DocumentReader;
+import searchengine.core.IndexSorter;
+
 import java.io.IOException;
 import java.util.Scanner;
 
 public class Application {
     private Scanner scanner;
-    private IndexManager indexManager;
+    private InvertedIndex index;
+    private DocumentReader reader;
     private QueryProcessor queryProcessor;
-
+    private IndexBuilder builder;
+    private ZipfApplier zipf;
 
     public Application() {
         scanner = new Scanner(System.in);
-        indexManager = new IndexManager();
-        queryProcessor = new QueryProcessor(indexManager, new CosineSimilarityRanking());
+        index = InvertedIndex.getInstance();
+        builder = new IndexBuilder();
+        queryProcessor = new QueryProcessor(index, new CosineSimilarityRanking());
+        reader = new DocumentReader();
+        zipf = new ZipfApplier(0.1); // por defecto
     }
 
     public void run() throws IOException {
@@ -31,50 +40,61 @@ public class Application {
     }
 
     private void initializeEngine() throws IOException {
-        System.out.println("=== Motor de Búsqueda ===");
-        System.out.println("Elija una opción de inicialización:");
-        System.out.println("1. Cargar índice binario");
-        System.out.println("2. Leer archivos y construir índice");
-        System.out.print("> ");
+        System.out.println("=== Motor de Busqueda ===");
+        System.out.println("1. Cargar indice binario");
+        System.out.println("2. Leer archivos y construir indice");
+        System.out.print("Opcion: ");
 
-        int choice = Integer.parseInt(scanner.nextLine());
+        int opcion = Integer.parseInt(scanner.nextLine());
 
-        if (choice == 1) {
-            indexManager.loadIndex();
-        } else if (choice == 2) {
-            FileReader reader = new FileReader();
-            Vector<Document> documents = reader.readFiles();
-            indexManager.buildIndex(documents);
-            indexManager.saveIndex();
+        if (opcion == 1) {
+            IndexPersistence.loadIndex(index);
+        } else if (opcion == 2) {
+            // Se lee los codumentos
+            Vector<Document> docs = reader.readFiles();
+            // Se construye el indice
+            builder.buildIndex(index, docs);
+            // Se guarda al momento
+            IndexPersistence.saveIndex(index);
         } else {
-            System.out.println("Opción inválida. Saliendo...");
+            System.out.println("Opcion invalida");
         }
     }
 
     private void configureZipf() {
-        System.out.print("Ingrese porcentaje de Ley de Zipf a aplicar (0 a 1, ej: 0.1): ");
-        double percentile = Double.parseDouble(scanner.nextLine());
+        System.out.print("Ingrese porcentaje de Zipf (0 a 1. ej: 0.1): ");
+        double percent = Double.parseDouble(scanner.nextLine());
 
-        ZipfLaw zipf = new  ZipfLaw(percentile);
-        zipf.filter(indexManager.getIndex());
+        zipf = new ZipfApplier(percent);
+
+        // Se ordena por TTF
+        IndexSorter.sortByTTF(index.getCorpus());
+
+        // Se aplica Zipf
+        zipf.filter(index);
+
+        // Se ordena alfabeticamente para poder usar Busqueda Binaria
+        IndexSorter.sortAlphabetically(index.getCorpus());
     }
 
     private void queryLoop() {
-        System.out.println("\nÍndice listo! Ingrese sus consultas (escriba 'salir' para terminar):");
+        System.out.println("Indice listo! Escriba su consulta (o 'salir')");
 
         while (true) {
             System.out.print("> ");
             String query = scanner.nextLine();
-            if (query.equalsIgnoreCase("salir")) break;
+            if (query.equalsIgnoreCase("salir")) {
+                break;
+            }
 
             Vector<DocumentScore> results = queryProcessor.process(query);
 
             if (results.getSize() == 0) {
-                System.out.println("No se encontraron documentos.");
+                System.out.println("No se encontraron documentos");
             } else {
                 System.out.println("Resultados:");
-                for (DocumentScore ds : results) {
-                    System.out.printf("- %s (score: %.4f)\n", ds.getDocument().getDecodedName(), ds.getScore());
+                for (DocumentScore documentScore : results) {
+                    System.out.println("- " + documentScore.getDocument().getDecodedName() + " (score: " + documentScore.getScore() + ")");
                 }
             }
         }
@@ -83,6 +103,7 @@ public class Application {
     }
 
     public static void main(String[] args) throws IOException {
-        new Application().run();
+        Application application = new Application();
+        application.run();
     }
 }

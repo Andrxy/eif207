@@ -56,9 +56,9 @@ public class Vector<T> implements Iterable<T>, Serializable {
     }
 
     public void swap(int i, int j) {
-        T tmp = vector[i];
+        T temp = vector[i];
         vector[i] = vector[j];
-        vector[j] = tmp;
+        vector[j] = temp;
     }
 
     @Override
@@ -72,6 +72,7 @@ public class Vector<T> implements Iterable<T>, Serializable {
         return sb.toString();
     }
 
+    // Implementacion Iterador
     @Override
     public Iterator<T> iterator() {
         return new Iterator<>() {

@@ -1,57 +1,62 @@
 package searchengine.ranking;
 
-import searchengine.core.IndexManager;
 import searchengine.datastructures.Vector;
 import searchengine.index.InvertedIndex;
-import searchengine.index.VectorTFIDF;
+import searchengine.core.VectorTFIDF;
 import searchengine.model.Document;
 import searchengine.model.DocumentScore;
 
 public class CosineSimilarityRanking implements RankingStrategy {
+
     @Override
-    public Vector<DocumentScore> rank(Vector<Double> queryVector, Vector<Document> candidates, IndexManager index) {
-        Vector<DocumentScore> results = new Vector<>();
+    public Vector<DocumentScore> rank(Vector<Double> queryVector, Vector<Document> documents, InvertedIndex index) {
+        Vector<DocumentScore> scores = new Vector<>();
 
-        for (Document doc : candidates) {
-            Vector<Double> documentVector = VectorTFIDF.buildDocumentVector(doc, index);
+        // calcular el score de cada documento con respecto a la query
+        for (Document document : documents) {
+            Vector<Double> docVector = VectorTFIDF.buildDocumentVector(document, index);
 
-            double score = computeCosineSimilarity(queryVector, documentVector);
+            double similarity = computeCosine(queryVector, docVector);
 
-            results.add(new DocumentScore(doc, score));
+            scores.add(new DocumentScore(document, similarity));
         }
 
-        sortScores(results);
+        // ordenar
+        bubbleSort(scores);
 
-        return results;
+        return scores;
     }
 
-    private double computeCosineSimilarity(Vector<Double> v1, Vector<Double> v2) {
-        double dot = 0.0;
-        double normV1 = 0.0;
-        double normV2 = 0.0;
+    // calculo de la similitud coseno
+    private double computeCosine(Vector<Double> v1, Vector<Double> v2) {
+        double dotProduct = 0;
+        double norm1 = 0;
+        double norm2 = 0;
 
-        int size = Math.min(v1.getSize(), v2.getSize());
-        for (int i = 0; i < size; i++) {
-            double a = v1.getAt(i);
-            double b = v2.getAt(i);
-            dot += a * b;
-            normV1 += a * a;
-            normV2 += b * b;
+        int n = v1.getSize();
+        for (int i = 0; i < n; i++) {
+            double val1 = v1.getAt(i);
+            double val2 = v2.getAt(i);
+
+            dotProduct += val1 * val2;
+            norm1 += val1 * val1;
+            norm2 += val2 * val2;
         }
 
-        if (normV1 == 0 || normV2 == 0) {
-            return 0.0; // evitar división por cero
+        if (norm1 == 0 || norm2 == 0) {
+            return 0; // evitar división entre 0
         }
 
-        return dot / (Math.sqrt(normV1) * Math.sqrt(normV2));
+        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
     }
 
-    private void sortScores(Vector<DocumentScore> results) {
-        int n = results.getSize();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (results.getAt(j).getScore() < results.getAt(j + 1).getScore()) {
-                    results.swap(j, j + 1);
+    // ordenar scores de mayor a menor
+    private void bubbleSort(Vector<DocumentScore> scores) {
+        int size = scores.getSize();
+        for (int i = 0; i < size - 1; i++) {
+            for (int j = 0; j < size - i - 1; j++) {
+                if (scores.getAt(j).getScore() < scores.getAt(j + 1).getScore()) {
+                    scores.swap(j, j + 1);
                 }
             }
         }
