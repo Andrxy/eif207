@@ -16,7 +16,6 @@ public class Application {
     private IndexManager indexManager;
     private QueryProcessor queryProcessor;
 
-    // Rutas absolutas predefinidas
     private static final String BINARY_INDEX_PATH = "data/index.bin";
     private static final String DOCUMENTS_DIR_PATH = "files";
 
@@ -39,24 +38,37 @@ public class Application {
         System.out.println("2. Leer archivos y construir índice");
         System.out.print("> ");
 
-        int choice = Integer.parseInt(scanner.nextLine());
+        String line = scanner.nextLine();
+        int choice = 0;
+        try {
+            choice = Integer.parseInt(line);
+        } catch (Exception e) {
+            choice = 0;
+        }
 
         if (choice == 1) {
             indexManager.loadIndex(BINARY_INDEX_PATH);
         } else if (choice == 2) {
-            Vector<Document> documents = indexManager.readDocuments(DOCUMENTS_DIR_PATH);
-            indexManager.buildIndex(documents);
+            Vector<Document> docs = indexManager.readDocuments(DOCUMENTS_DIR_PATH);
+            indexManager.buildIndex(docs);
             indexManager.saveIndex(BINARY_INDEX_PATH);
         } else {
-            System.out.println("Opción inválida. Saliendo...");
-            System.exit(0);
+            System.out.println("Opción inválida.");
+            return;
         }
     }
 
     private void configureZipf() {
         System.out.print("Ingrese porcentaje de Ley de Zipf a aplicar (0 a 1, ej: 0.1): ");
-        double percentile = Double.parseDouble(scanner.nextLine());
-        indexManager.applyZipf(percentile);
+        String line = scanner.nextLine();
+        double percent = 0.0;
+        try {
+            percent = Double.parseDouble(line);
+        } catch (Exception e) {
+            percent = 0.0;
+        }
+
+        indexManager.applyZipf(percent);
         indexManager.sortAlphabetically();
     }
 
@@ -66,7 +78,9 @@ public class Application {
         while (true) {
             System.out.print("> ");
             String query = scanner.nextLine();
-            if (query.equalsIgnoreCase("salir")) break;
+            if (query.toLowerCase().equals("salir")) {
+                break;
+            }
 
             Vector<DocumentScore> results = queryProcessor.process(query);
 
@@ -74,7 +88,8 @@ public class Application {
                 System.out.println("No se encontraron documentos.");
             } else {
                 System.out.println("Resultados:");
-                for (DocumentScore ds : results) {
+                for (int i = 0; i < results.getSize(); i++) {
+                    DocumentScore ds = results.getAt(i);
                     System.out.printf("- %s (score: %.4f)\n", ds.getDocument().getDecodedName(), ds.getScore());
                 }
             }
@@ -84,6 +99,7 @@ public class Application {
     }
 
     public static void main(String[] args) throws IOException {
-        new Application().run();
+        Application app = new Application();
+        app.run();
     }
 }

@@ -7,14 +7,15 @@ import searchengine.model.Term;
 import searchengine.model.Document;
 
 public class VectorTFIDF {
+
     public static Vector<Double> buildDocumentVector(Document doc, IndexManager manager) {
         Vector<Double> vector = new Vector<>();
         Vector<Term> corpus = manager.getCorpus();
 
-        for (Term term : corpus) {
+        for (int i = 0; i < corpus.getSize(); i++) {
+            Term term = corpus.getAt(i);
             double tf = getTF(term, doc);
             double idf = term.getIdf();
-
             vector.add(tf * idf);
         }
 
@@ -25,7 +26,8 @@ public class VectorTFIDF {
         Vector<Double> vector = new Vector<>();
         Vector<Term> corpus = manager.getCorpus();
 
-        for (Term term : corpus) {
+        for (int i = 0; i < corpus.getSize(); i++) {
+            Term term = corpus.getAt(i);
             double tf = getQueryTF(term.getTerm(), tokenizedQuery);
             double idf = term.getIdf();
             vector.add(tf * idf);
@@ -35,7 +37,9 @@ public class VectorTFIDF {
     }
 
     private static double getTF(Term term, Document doc) {
-        for (Posting posting : term.getPostings()) {
+        Vector<Posting> postings = term.getPostings();
+        for (int i = 0; i < postings.getSize(); i++) {
+            Posting posting = postings.getAt(i);
             if (posting.getDocument().getId() == doc.getId()) {
                 return posting.getTf();
             }
@@ -44,24 +48,33 @@ public class VectorTFIDF {
     }
 
     private static double getQueryTF(String term, Vector<String> tokens) {
-        int freq = 0;
-        for (String token : tokens) {
-            if (token.equals(term)) freq++;
+        double freq = 0.0;
+        for (int i = 0; i < tokens.getSize(); i++) {
+            if (tokens.getAt(i).equals(term)) {
+                freq = freq + 1.0;
+            }
         }
-        return (double) freq;
+        return freq;
     }
 
     private static Vector<Double> normalize(Vector<Double> vector) {
         double norm = 0.0;
-        for (Double val : vector) norm += val * val;
+        for (int i = 0; i < vector.getSize(); i++) {
+            double val = vector.getAt(i);
+            norm = norm + val * val;
+        }
         norm = Math.sqrt(norm);
 
-        Vector<Double> normalized = new Vector<>();
-        if (norm == 0) return vector;
+        if (norm == 0.0) {
+            return vector;
+        }
 
-        for (Double val : vector) {
+        Vector<Double> normalized = new Vector<>();
+        for (int i = 0; i < vector.getSize(); i++) {
+            double val = vector.getAt(i);
             normalized.add(val / norm);
         }
+
         return normalized;
     }
 }

@@ -5,39 +5,56 @@ import searchengine.index.InvertedIndex;
 import searchengine.model.Document;
 import searchengine.model.Term;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
 
 public class IndexPersistence {
-    public static void saveIndex(InvertedIndex index, String filePath) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            // Guardar documentos
-            oos.writeObject(index.getDocuments());
 
-            // Guardar corpus (Terms con postings)
-            oos.writeObject(index.getCorpus());
+    public static void saveIndex(InvertedIndex index, String filePath) {
+        ObjectOutputStream oos = null;
+
+        try {
+            oos = new ObjectOutputStream(new FileOutputStream(filePath));
+
+            Vector<Document> documents = index.getDocuments();
+            oos.writeObject(documents);
+
+            Vector<Term> corpus = index.getCorpus();
+            oos.writeObject(corpus);
 
             System.out.println("Índice guardado correctamente en " + filePath);
+
+            oos.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Carga el índice invertido desde un archivo binario.
-     */
-    @SuppressWarnings("unchecked")
     public static void loadIndex(InvertedIndex index, String filePath) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            // Cargar documentos
-            Vector<Document> documents = (Vector<Document>) ois.readObject();
+        ObjectInputStream ois = null;
+
+        try {
+            ois = new ObjectInputStream(new FileInputStream(filePath));
+
+            Object objDocs = ois.readObject();
+            Vector<Document> documents = (Vector<Document>) objDocs;
             index.setDocuments(documents);
 
-            // Cargar corpus
-            Vector<Term> corpus = (Vector<Term>) ois.readObject();
+            Object objCorpus = ois.readObject();
+            Vector<Term> corpus = (Vector<Term>) objCorpus;
             index.setCorpus(corpus);
 
             System.out.println("Índice cargado correctamente desde " + filePath);
-        } catch (IOException | ClassNotFoundException e) {
+
+            ois.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

@@ -30,21 +30,35 @@ public class CosineSimilarityRanking implements RankingStrategy {
         double normV1 = 0.0;
         double normV2 = 0.0;
 
-        int size = Math.min(v1.getSize(), v2.getSize());
+        int size1 = v1.getSize();
+        int size2 = v2.getSize();
+        int size;
+
+        if (size2 < size1) {
+            size = size2;
+        } else {
+            size = size1;
+        }
+
         for (int i = 0; i < size; i++) {
             double a = v1.getAt(i);
             double b = v2.getAt(i);
-            dot += a * b;
-            normV1 += a * a;
-            normV2 += b * b;
+            dot = dot + (a * b);
+            normV1 = normV1 + (a * a);
+            normV2 = normV2 + (b * b);
         }
 
-        if (normV1 == 0 || normV2 == 0) {
-            return 0.0; // evitar división por cero
+        if (normV1 == 0.0) {
+            return 0.0;
+        }
+
+        if (normV2 == 0.0) {
+            return 0.0;
         }
 
         return dot / (Math.sqrt(normV1) * Math.sqrt(normV2));
     }
+
 
     private void sortScores(Vector<DocumentScore> results) {
         int n = results.getSize();

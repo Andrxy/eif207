@@ -10,19 +10,49 @@ public class Normalizer {
     }
 
     private static String toLowerCase(String content) {
-        return content.toLowerCase();
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                c = (char)(c + 32);
+            }
+            result.append(c);
+        }
+        return result.toString();
     }
 
     private static String replacePunctuation(String content) {
-        return content.replaceAll("[^a-zA-Z0-9]", " ");
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+                result.append(c);
+            } else {
+                result.append(' ');
+            }
+        }
+        return result.toString();
     }
 
     private static String replaceAccents(String content) {
-        return content
-                .replace("á", "a")
-                .replace("é", "e")
-                .replace("í", "i")
-                .replace("ó", "o")
-                .replace("ú", "u");
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+
+            if (c == 'á') {
+                c = 'a';
+            } else if (c == 'é') {
+                c = 'e';
+            } else if (c == 'í') {
+                c = 'i';
+            } else if (c == 'ó') {
+                c = 'o';
+            } else if (c == 'ú') {
+                c = 'u';
+            }
+            result.append(c);
+        }
+        return result.toString();
     }
+
 }
