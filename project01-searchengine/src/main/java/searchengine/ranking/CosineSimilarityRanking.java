@@ -22,7 +22,7 @@ public class CosineSimilarityRanking implements RankingStrategy {
         }
 
         // ordenar
-        bubbleSort(scores);
+        sort(scores);
 
         return scores;
     }
@@ -51,7 +51,7 @@ public class CosineSimilarityRanking implements RankingStrategy {
     }
 
     // ordenar scores de mayor a menor
-    private void bubbleSort(Vector<DocumentScore> scores) {
+    private void sort(Vector<DocumentScore> scores) {
         int size = scores.getSize();
         for (int i = 0; i < size - 1; i++) {
             for (int j = 0; j < size - i - 1; j++) {
