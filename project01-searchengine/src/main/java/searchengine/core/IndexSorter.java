@@ -58,7 +58,7 @@ public class IndexSorter {
     private static void countingSortByChar(Vector<Term> corpus, int pos) {
         int n = corpus.getSize();
         Term[] output = new Term[n];
-        int[] count = new int[128]; // ASCII simple
+        int[] count = new int[128];
 
         for (int i = 0; i < 128; i++) count[i] = 0;
 
@@ -75,7 +75,9 @@ public class IndexSorter {
         // construir arreglo ordenado
         for (int i = n - 1; i >= 0; i--) {
             String term = corpus.getAt(i).getTerm();
+
             char c = pos < term.length() ? term.charAt(pos) : 0;
+
             output[count[c] - 1] = corpus.getAt(i);
             count[c]--;
         }

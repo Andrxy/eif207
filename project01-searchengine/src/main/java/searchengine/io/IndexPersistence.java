@@ -28,7 +28,13 @@ public class IndexPersistence {
         }
     }
 
-    public static void loadIndex(InvertedIndex index) {
+    public static void loadIndex(InvertedIndex index) throws FileNotFoundException {
+        File file = new File(filePath);
+
+        if (!file.exists()) {
+            throw new FileNotFoundException("El archivo no existe");
+        }
+
         try {
             ObjectInputStream input = new ObjectInputStream(new FileInputStream(filePath));
 

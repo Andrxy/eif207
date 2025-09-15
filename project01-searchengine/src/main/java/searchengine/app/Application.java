@@ -13,6 +13,7 @@ import searchengine.ranking.CosineSimilarityRanking;
 import searchengine.io.DocumentReader;
 import searchengine.core.IndexSorter;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -48,7 +49,18 @@ public class Application {
         int opcion = Integer.parseInt(scanner.nextLine());
 
         if (opcion == 1) {
-            IndexPersistence.loadIndex(index);
+            try {
+                IndexPersistence.loadIndex(index);
+            }
+            catch (FileNotFoundException e) {
+                System.out.println("Error: No se encontró el archivo de índice.");
+                System.out.println("Construyendo nuevo índice desde archivos...");
+
+                Vector<Document> docs = reader.readFiles();
+                builder.buildIndex(index, docs);
+                IndexPersistence.saveIndex(index);
+            }
+
         } else if (opcion == 2) {
             // Se lee los codumentos
             Vector<Document> docs = reader.readFiles();
